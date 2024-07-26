@@ -1,12 +1,45 @@
-import { useRef } from "react"
-import { useGLTF, useAnimations } from "@react-three/drei"
+import React, {
+  useRef,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react"
+import { useGLTF } from "@react-three/drei"
+import { useAnimationControl } from "./hooks/useAnimationControl.jsx"
 
-export default function CubeModel(props) {
+const parts = ["drums", "vocals", "highs", "mids", "lows"]
+
+const CubeModel = forwardRef((props, ref) => {
   const group = useRef()
   const { nodes, materials, animations } = useGLTF("/models/dummy_ani_03.glb")
-  const { actions, names } = useAnimations(animations)
+  const { selectPart, rotatePart, selectedPart, playAnimation } =
+    useAnimationControl(animations)
 
-  // Animation control logic here
+  useEffect(() => {
+    console.log("CubeModel mounted")
+    selectPart(parts[0])
+  }, [])
+
+  const handleUpDown = (direction) => {
+    console.log("CubeModel handleUpDown called with direction:", direction)
+    const currentIndex = parts.indexOf(selectedPart)
+    const newIndex =
+      direction === "up"
+        ? (currentIndex + 1) % parts.length
+        : (currentIndex - 1 + parts.length) % parts.length
+    selectPart(parts[newIndex])
+  }
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      handleUpDown,
+      rotatePart,
+    }),
+    [selectedPart]
+  )
+
+  console.log("CubeModel rendering")
 
   return (
     <group ref={group} {...props} dispose={null} position={[0, -2, 0]}>
@@ -57,6 +90,8 @@ export default function CubeModel(props) {
       </group>
     </group>
   )
-}
+})
 
-useGLTF.preload("/dummy_ani_03.glb")
+useGLTF.preload("./models/dummy_ani_03.glb")
+
+export default CubeModel
