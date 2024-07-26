@@ -8,9 +8,6 @@ export function useAnimationControl(animations, group) {
   const { actions, names } = useAnimations(animations, group)
   const [selectedPart, setSelectedPart] = useState(null)
 
-  // console.log("Available animations:", Object.keys(animations))
-  // console.log("Available actions:", names)
-
   const playAnimation = (animationName, loop = false) => {
     const action = actions[animationName]
     if (action) {
@@ -38,26 +35,25 @@ export function useAnimationControl(animations, group) {
     if (selectedPart) {
       // Deselect current part
       if (selectedPart === "drums") {
-        playAnimation("drums_deselect")
-        // actions["drums_deselect"].reset().play()
-        console.log("if drums selected, play drums deselect")
+        // playAnimation("drums_deselect")
       }
-      // stopAnimation(`${selectedPart}_select`)
-      // stopAnimation(`drums_select`)
-      // actions["drums_select"].reset().play()
+      // stopAnimation(`drums_deselect`)
       console.log(`stop Animation`)
     }
 
     setSelectedPart(part)
-    // playAnimation(`${part}_select`)
-    // actions["drums_select"].reset().play()
+    // playAnimation(`${selectedPart}_explode`)
+
     console.log(`here should play the explode animation`)
   }
 
   const rotatePart = (direction) => {
     if (!selectedPart) return
-    console.log("rotation direction:", direction)
-    playAnimation(`${selectedPart}_explode`)
+    if (direction === "left") {
+      playAnimation(`${selectedPart}_explode`)
+    } else if (direction === "right") {
+      playAnimation(`${selectedPart}_deexplode`)
+    }
   }
 
   return {

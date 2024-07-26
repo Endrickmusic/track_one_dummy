@@ -23,6 +23,7 @@ const CubeModel = forwardRef((props, ref) => {
   const handleUpDown = (direction) => {
     console.log("CubeModel handleUpDown called with direction:", direction)
     const currentIndex = parts.indexOf(selectedPart)
+    console.log("currentIndex:", currentIndex)
     const newIndex =
       direction === "up"
         ? (currentIndex + 1) % parts.length

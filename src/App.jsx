@@ -10,13 +10,12 @@ export default function App() {
   const cubeRef = useRef()
 
   const handleUpDown = (direction) => {
-    console.log("handleUpDown called with direction:", direction)
-    console.log("cubeRef.current:", cubeRef.current)
     cubeRef.current?.handleUpDown(direction)
   }
 
   const handleRotate = (direction) => {
-    cubeRef.current?.rotatePart(direction)
+    cubeRef.current.rotatePart(direction)
+    console.log("handleRotate called with direction:", direction)
   }
 
   return (
