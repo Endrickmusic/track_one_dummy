@@ -11,9 +11,9 @@ const parts = ["drums", "vocals", "highs", "mids", "lows"]
 
 const CubeModel = forwardRef((props, ref) => {
   const group = useRef()
-  const { nodes, materials, animations } = useGLTF("/models/dummy_ani_03.glb")
+  const { nodes, materials, animations } = useGLTF("/models/cube.glb")
   const { selectPart, rotatePart, selectedPart, playAnimation } =
-    useAnimationControl(animations)
+    useAnimationControl(animations, group)
 
   useEffect(() => {
     console.log("CubeModel mounted")
@@ -92,6 +92,6 @@ const CubeModel = forwardRef((props, ref) => {
   )
 })
 
-useGLTF.preload("./models/dummy_ani_03.glb")
+useGLTF.preload("./models/cube.glb")
 
 export default CubeModel

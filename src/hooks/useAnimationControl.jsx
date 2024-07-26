@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { useAnimations } from "@react-three/drei"
+import { LoopOnce } from "three"
 
-export function useAnimationControl(animations) {
-  const { actions, names } = useAnimations(animations)
+export function useAnimationControl(animations, group) {
+  const { actions, names } = useAnimations(animations, group)
   const [selectedPart, setSelectedPart] = useState(null)
 
-  console.log("Available animations:", Object.keys(animations))
-  console.log("Available actions:", names)
+  // console.log("Available animations:", Object.keys(animations))
+  // console.log("Available actions:", names)
 
   const playAnimation = (animationName, loop = false) => {
     const action = actions[animationName]
@@ -16,7 +17,7 @@ export function useAnimationControl(animations) {
       action.reset().play()
       if (!loop) {
         action.clampWhenFinished = true
-        action.loop = THREE.LoopOnce
+        action.loop = LoopOnce
       }
     } else {
       console.error(`Animation ${animationName} not found`)
@@ -42,26 +43,21 @@ export function useAnimationControl(animations) {
         console.log("if drums selected, play drums deselect")
       }
       // stopAnimation(`${selectedPart}_select`)
-      stopAnimation(`drums_select`)
+      // stopAnimation(`drums_select`)
       // actions["drums_select"].reset().play()
       console.log(`stop Animation`)
     }
 
     setSelectedPart(part)
     // playAnimation(`${part}_select`)
-    // playAnimation(`${part}_explode`)
-    playAnimation(`vocals_explode`)
     // actions["drums_select"].reset().play()
     console.log(`here should play the explode animation`)
   }
 
   const rotatePart = (direction) => {
     if (!selectedPart) return
-    // playAnimation(`${selectedPart}_rotate_${direction}`)
+    console.log("rotation direction:", direction)
     playAnimation(`${selectedPart}_explode`)
-    actions["drums_select"].reset().play()
-    // console.log(`${selectedPart}_rotate_${direction}`)
-    console.log("rotation")
   }
 
   return {
