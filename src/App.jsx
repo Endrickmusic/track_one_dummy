@@ -1,22 +1,35 @@
-import React, { useState } from "react"
+import React, { useState, useCallback } from "react"
 import { Canvas } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
-
 import CubeModel from "./CubeModel"
 import Controls from "./ControlPanel"
 
+const parts = ["drums", "vocals", "highs", "mids", "lows"]
+
 const App = () => {
   const [selectedPart, setSelectedPart] = useState("vocals")
-  console.log(selectedPart)
+  const [rotationDirection, setRotationDirection] = useState(null)
 
-  const handleSelectPart = (part) => {
-    setSelectedPart(part)
-  }
+  const handleSelectPart = useCallback(
+    (direction) => {
+      const currentIndex = parts.indexOf(selectedPart)
+      let newIndex
+      if (direction === "up") {
+        newIndex = (currentIndex + 1) % parts.length
+      } else if (direction === "down") {
+        newIndex = (currentIndex - 1 + parts.length) % parts.length
+      }
+      setSelectedPart(parts[newIndex])
+      console.log(`Selected part: ${selectedPart}`)
+    },
+    [selectedPart]
+  )
 
-  const handleRotatePart = (direction) => {
+  const handleRotatePart = useCallback((direction) => {
+    setRotationDirection(direction)
+    // Log the rotation direction
     console.log(`Rotating ${direction}`)
-    // Additional rotation logic if needed
-  }
+  }, [])
 
   return (
     <>
