@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react"
+import React, { useRef, useEffect, useState } from "react"
 import { useGLTF } from "@react-three/drei"
 import { useSpring, animated } from "@react-spring/three"
 import { useAnimationControl } from "./hooks/useAnimationControl"
@@ -10,9 +10,10 @@ const CubeModel = ({ selectedPart, onRotationFinished }) => {
 
   // Animation state
   const [props, set] = useSpring(() => ({ rotation: [0, 0, 0] }))
+  const hasMounted = useRef(false)
 
   useEffect(() => {
-    if (selectedPart) {
+    if (hasMounted.current && selectedPart) {
       // Play explode animation for the selected part
       playExplodeAnimation(selectedPart)
 
@@ -21,9 +22,10 @@ const CubeModel = ({ selectedPart, onRotationFinished }) => {
       set({ rotation: [0, 0, rotationAngle], onRest: onRotationFinished })
     } else {
       // Rotate back to the default position if no part is selected
-      set({ rotation: [0, 0, Math.PI / 2], onRest: onRotationFinished })
+      set({ rotation: [0, 0, 0], onRest: onRotationFinished })
     }
-  }, [selectedPart, set, playExplodeAnimation, onRotationFinished])
+    hasMounted.current = true
+  }, [selectedPart, set, playExplodeAnimation, onRotationFinished, hasMounted])
 
   return (
     <animated.group ref={group} {...props} dispose={null}>
