@@ -8,6 +8,7 @@ const parts = ["drums", "vocals", "highs", "mids", "lows"]
 
 const App = () => {
   const [selectedPart, setSelectedPart] = useState("vocals")
+  const [previousPart, setPreviousPart] = useState(null)
   const [rotationDirection, setRotationDirection] = useState(null)
 
   const handleSelectPart = useCallback(
@@ -40,6 +41,7 @@ const App = () => {
         <pointLight position={[2, -3, 2]} intensity={40} />
         <CubeModel
           selectedPart={selectedPart}
+          previousPart={previousPart}
           onRotationFinished={() => console.log("Rotation finished")}
         />
       </Canvas>

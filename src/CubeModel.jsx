@@ -3,32 +3,49 @@ import { useGLTF } from "@react-three/drei"
 import { useSpring, animated } from "@react-spring/three"
 import { useAnimationControl } from "./hooks/useAnimationControl"
 
-const CubeModel = ({ selectedPart, onRotationFinished }) => {
+const CubeModel = ({ selectedPart, previousPart, onRotationFinished }) => {
   const group = useRef()
   const { nodes, materials, animations } = useGLTF("/models/cube.glb")
-  const { playExplodeAnimation } = useAnimationControl(animations, group)
+  const { playSelectAnimation, playDeselectAnimation } = useAnimationControl(
+    animations,
+    group
+  )
 
   // Animation state
   const [props, set] = useSpring(() => ({ rotation: [0, 0, 0] }))
   const hasMounted = useRef(false)
+  const [rotationProps, setRotation] = useSpring(() => ({
+    rotation: [0, 0, 0],
+  }))
 
   useEffect(() => {
-    if (hasMounted.current && selectedPart) {
-      // Play explode animation for the selected part
-      playExplodeAnimation(selectedPart)
+    if (previousPart && previousPart !== selectedPart) {
+      playDeselectAnimation(previousPart)
+    }
+    if (selectedPart) {
+      playSelectAnimation(selectedPart)
 
       // Rotate the cube based on the selected part
       const rotationAngle = selectedPart === "drums" ? -Math.PI / 2 : 0
-      set({ rotation: [0, 0, rotationAngle], onRest: onRotationFinished })
+      setRotation({
+        rotation: [0, 0, rotationAngle],
+        onRest: onRotationFinished,
+      })
     } else {
       // Rotate back to the default position if no part is selected
-      set({ rotation: [0, 0, 0], onRest: onRotationFinished })
+      setRotation({ rotation: [0, 0, 0], onRest: onRotationFinished })
     }
-    hasMounted.current = true
-  }, [selectedPart, set, playExplodeAnimation, onRotationFinished, hasMounted])
+  }, [
+    selectedPart,
+    previousPart,
+    setRotation,
+    playSelectAnimation,
+    playDeselectAnimation,
+    onRotationFinished,
+  ])
 
   return (
-    <animated.group ref={group} {...props} dispose={null}>
+    <animated.group ref={group} {...rotationProps} dispose={null}>
       <group name="Scene">
         <group name="Cube" position={[0, 0, 0]} rotation={[0, 0, 0]}>
           <mesh
