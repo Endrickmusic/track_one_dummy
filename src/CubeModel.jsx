@@ -1,64 +1,41 @@
-import React, {
-  useRef,
-  useEffect,
-  forwardRef,
-  useImperativeHandle,
-} from "react"
+import React, { useRef, useEffect } from "react"
 import { useGLTF } from "@react-three/drei"
-import { useAnimationControl } from "./hooks/useAnimationControl.jsx"
+import { useSpring, animated } from "@react-spring/three"
+import { useAnimationControl } from "./hooks/useAnimationControl"
 
-const parts = ["drums", "vocals", "highs", "mids", "lows"]
-
-const CubeModel = forwardRef((props, ref) => {
+const CubeModel = ({ selectedPart, onRotationFinished }) => {
   const group = useRef()
-  const cube = useRef()
   const { nodes, materials, animations } = useGLTF("/models/cube.glb")
-  const { selectPart, rotatePart, selectedPart, playAnimation } =
-    useAnimationControl(animations, group, cube)
+  const { playExplodeAnimation } = useAnimationControl(animations, group)
 
-  const handleUpDown = (direction) => {
-    console.log("CubeModel handleUpDown called with direction:", direction)
-    const currentIndex = parts.indexOf(selectedPart)
-    const newIndex =
-      direction === "up"
-        ? (currentIndex + 1) % parts.length
-        : (currentIndex - 1 + parts.length) % parts.length
-    selectPart(parts[newIndex])
-  }
+  // Animation state
+  const [props, set] = useSpring(() => ({ rotation: [0, 0, 0] }))
 
-  const handleRotate = (direction) => {
-    console.log("CubeModel handleRotate called with direction:", direction)
-    rotatePart(direction) // Perform the rotation
-  }
+  useEffect(() => {
+    if (selectedPart) {
+      // Play explode animation for the selected part
+      playExplodeAnimation(selectedPart)
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      handleUpDown,
-      handleRotate,
-      rotatePart,
-    }),
-    [selectedPart]
-  )
-
-  console.log("CubeModel rendering")
+      // Rotate the cube based on the selected part
+      const rotationAngle = selectedPart === "drums" ? -Math.PI / 2 : 0
+      set({ rotation: [0, 0, rotationAngle], onRest: onRotationFinished })
+    } else {
+      // Rotate back to the default position if no part is selected
+      set({ rotation: [0, 0, Math.PI / 2], onRest: onRotationFinished })
+    }
+  }, [selectedPart, set, playExplodeAnimation, onRotationFinished])
 
   return (
-    <group ref={group} {...props} dispose={null} position={[0, -2, 0]}>
+    <animated.group ref={group} {...props} dispose={null}>
       <group name="Scene">
-        <group
-          ref={cube}
-          name="Cube"
-          position={[0, 2, 0]}
-          rotation={[0, 0, -Math.PI / 2]}
-        >
+        <group name="Cube" position={[0, 0, 0]} rotation={[0, 0, 0]}>
           <mesh
             name="0_drums"
             castShadow
             receiveShadow
             geometry={nodes["0_drums"].geometry}
             material={materials.Material}
-            position={[-1.621, 0.3, 0]}
+            position={[-1.521, 0, 0]}
             rotation={[0, 0, -Math.PI / 2]}
           />
           <mesh
@@ -67,7 +44,7 @@ const CubeModel = forwardRef((props, ref) => {
             receiveShadow
             geometry={nodes["1_vocals"].geometry}
             material={materials.Material}
-            position={[0.606, 2.12, 0]}
+            position={[0.506, 1.52, 0]}
           />
           <mesh
             name="2_highs"
@@ -75,7 +52,7 @@ const CubeModel = forwardRef((props, ref) => {
             receiveShadow
             geometry={nodes["2_highs"].geometry}
             material={materials.Material}
-            position={[0.606, 0.908, 0]}
+            position={[0.506, 0.508, 0]}
           />
           <mesh
             name="3_mids"
@@ -83,7 +60,7 @@ const CubeModel = forwardRef((props, ref) => {
             receiveShadow
             geometry={nodes["3_mids"].geometry}
             material={materials.Material}
-            position={[0.606, -0.307, 0]}
+            position={[0.506, -0.507, 0]}
           />
           <mesh
             name="4_lows"
@@ -91,14 +68,14 @@ const CubeModel = forwardRef((props, ref) => {
             receiveShadow
             geometry={nodes["4_lows"].geometry}
             material={materials.Material}
-            position={[0.606, -1.519, 0]}
+            position={[0.506, -1.519, 0]}
           />
         </group>
       </group>
-    </group>
+    </animated.group>
   )
-})
+}
 
-useGLTF.preload("./models/cube.glb")
+useGLTF.preload("/models/cube.glb")
 
 export default CubeModel

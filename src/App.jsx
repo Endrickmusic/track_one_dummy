@@ -1,37 +1,38 @@
-// components/App.js
-
-import { useRef } from "react"
+import React, { useState } from "react"
 import { Canvas } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
-import CubeModel from "./CubeModel.jsx"
-import { ControlPanel } from "./ControlPanel"
 
-export default function App() {
-  const cubeRef = useRef()
+import CubeModel from "./CubeModel"
+import Controls from "./ControlPanel"
 
-  const handleUpDown = (direction) => {
-    cubeRef.current.handleUpDown(direction)
+const App = () => {
+  const [selectedPart, setSelectedPart] = useState("vocals")
+  console.log(selectedPart)
+
+  const handleSelectPart = (part) => {
+    setSelectedPart(part)
   }
 
-  const handleRotate = (direction) => {
-    cubeRef.current.rotatePart(direction)
-    console.log("handleRotate called with direction:", direction)
+  const handleRotatePart = (direction) => {
+    console.log(`Rotating ${direction}`)
+    // Additional rotation logic if needed
   }
 
   return (
     <>
       <Canvas>
         <OrbitControls />
-        <ambientLight intensity={0.0} />
-        <spotLight
-          position={[5, 10, 5]}
-          angle={0.35}
-          penumbra={0.5}
-          intensity={180}
+        <pointLight position={[0, 10, 8]} intensity={50} />
+        <pointLight position={[-5, -10, -5]} intensity={120} />
+        <pointLight position={[2, -3, 2]} intensity={40} />
+        <CubeModel
+          selectedPart={selectedPart}
+          onRotationFinished={() => console.log("Rotation finished")}
         />
-        <CubeModel ref={cubeRef} />
       </Canvas>
-      <ControlPanel onUpDown={handleUpDown} onRotate={handleRotate} />
+      <Controls onSelectPart={handleSelectPart} onRotate={handleRotatePart} />
     </>
   )
 }
+
+export default App
