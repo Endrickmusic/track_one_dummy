@@ -11,19 +11,14 @@ const parts = ["drums", "vocals", "highs", "mids", "lows"]
 
 const CubeModel = forwardRef((props, ref) => {
   const group = useRef()
+  const cube = useRef()
   const { nodes, materials, animations } = useGLTF("/models/cube.glb")
   const { selectPart, rotatePart, selectedPart, playAnimation } =
-    useAnimationControl(animations, group)
-
-  useEffect(() => {
-    console.log("CubeModel mounted")
-    selectPart(parts[0])
-  }, [])
+    useAnimationControl(animations, group, cube)
 
   const handleUpDown = (direction) => {
     console.log("CubeModel handleUpDown called with direction:", direction)
     const currentIndex = parts.indexOf(selectedPart)
-    console.log("currentIndex:", currentIndex)
     const newIndex =
       direction === "up"
         ? (currentIndex + 1) % parts.length
@@ -31,10 +26,16 @@ const CubeModel = forwardRef((props, ref) => {
     selectPart(parts[newIndex])
   }
 
+  const handleRotate = (direction) => {
+    console.log("CubeModel handleRotate called with direction:", direction)
+    rotatePart(direction) // Perform the rotation
+  }
+
   useImperativeHandle(
     ref,
     () => ({
       handleUpDown,
+      handleRotate,
       rotatePart,
     }),
     [selectedPart]
@@ -45,7 +46,12 @@ const CubeModel = forwardRef((props, ref) => {
   return (
     <group ref={group} {...props} dispose={null} position={[0, -2, 0]}>
       <group name="Scene">
-        <group name="Cube" position={[0, 2, 0]} rotation={[0, 0, -Math.PI / 2]}>
+        <group
+          ref={cube}
+          name="Cube"
+          position={[0, 2, 0]}
+          rotation={[0, 0, -Math.PI / 2]}
+        >
           <mesh
             name="0_drums"
             castShadow

@@ -10,7 +10,7 @@ export default function App() {
   const cubeRef = useRef()
 
   const handleUpDown = (direction) => {
-    cubeRef.current?.handleUpDown(direction)
+    cubeRef.current.handleUpDown(direction)
   }
 
   const handleRotate = (direction) => {
